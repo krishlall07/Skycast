@@ -1,0 +1,1231 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+:root {
+  --bg-color: #121212;
+  --card-bg: #1e1e1e;
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+  --hover-bg: #2a2a2a;
+  --accent-blue: #bbd8ec;
+}
+/* =========================================
+   GLOBAL SLEEK SCROLLBARS 
+   ========================================= */
+
+/* For Chrome, Safari, and Edge */
+::-webkit-scrollbar {
+  width: 6px; /* Thin width */
+  height: 6px; /* Thin height for horizontal scroll */
+}
+
+/* The background track (keep it invisible) */
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+/* The actual draggable bar */
+::-webkit-scrollbar-thumb {
+  background: rgba(155, 155, 155, 0.4); /* Subtle grey */
+  border-radius: 20px;
+  border: 2px solid transparent; /* Acts as padding */
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(155, 155, 155, 0.7); /* Darker when hovering */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(155, 155, 155, 0.4) transparent;
+}
+
+/* --- Light Mode Variables --- */
+body.light-mode {
+  --bg-color: #f3f4f6;       /* Light grey background */
+  --card-bg: #ffffff;        /* Pure white cards */
+  --text-primary: #1f2937;   /* Dark grey/black text */
+  --text-secondary: #6b7280; /* Medium grey text */
+  --hover-bg: #e5e7eb;       /* Slightly darker grey for hovers */
+  /* --accent-blue stays the same! */
+}
+/* --- Rain Chart Light Mode Adaptation --- */
+body.light-mode .chart-line {
+  background-color: #3b82f6; /* A deeper, vibrant blue for contrast */
+}
+
+body.light-mode .chart-dot {
+  background-color: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); /* A slightly darker blue glow */
+}
+/* --- Promo Card: Topographical Light Mode Adaptation --- */
+body.light-mode .promo-card {
+  /* Swaps to the light topographical map texture */
+  background: url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop') center/cover;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Adds a soft white frost over the map so the text stays crisp */
+body.light-mode .promo-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%);
+  z-index: 1;
+}
+
+/* Ensures text and button sit on top of the frost */
+body.light-mode .promo-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+body.light-mode .promo-card h3 {
+  color: #1e293b; /* Deep slate for a premium look */
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-shadow: none; /* Removed the heavy glow for a cleaner look */
+  margin: 0;
+}
+
+body.light-mode .promo-btn {
+  background-color: #3b82f6; 
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  border: none;
+}
+
+body.light-mode .promo-btn:hover {
+  background-color: #2563eb;
+}
+/* Add a smooth transition to the body so it fades nicely between themes */
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Make sure our individual cards also transition smoothly */
+.search-container, .header-controls button, .mode-toggle, .current-weather-card, 
+.forecast-mini-card, .overview-card, .city-card {
+  transition: background-color 0.3s ease, transform 0.2s ease, color 0.3s ease;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* --- Dashboard Container --- */
+.dashboard-container {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* --- Header Styles --- */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.location-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.location-text {
+  color: var(--text-primary);
+}
+
+.icon-secondary {
+  color: var(--text-secondary);
+}
+
+/* --- Search Bar --- */
+.search-container {
+  display: flex;
+  align-items: center;
+  background-color: var(--card-bg);
+  border-radius: 25px;
+  padding: 12px 20px;
+  width: 40%;
+  max-width: 450px;
+  gap: 10px;
+}
+
+.search-input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  width: 100%;
+  outline: none;
+  font-size: 1rem;
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* --- Header Controls --- */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-controls button {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.header-controls button:hover {
+  background-color: var(--hover-bg);
+}
+
+.theme-toggle {
+  background-color: var(--card-bg) !important;
+  border-radius: 20px !important;
+  padding: 10px 20px !important;
+}
+
+/* --- Mobile Responsiveness for Header --- */
+@media (max-width: 768px) {
+  .header-container {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .search-container {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* --- Main Layout Grid --- */
+.main-layout {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr; /* Desktop: Left side is wider */
+  gap: 30px;
+  margin-top: 10px;
+}
+
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* --- Dashboard Navigation --- */
+.dashboard-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.timeframe-tabs {
+  display: flex;
+  list-style: none;
+  gap: 25px;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.timeframe-tabs li {
+  cursor: pointer;
+  transition: color 0.3s ease;
+  position: relative;
+  padding-bottom: 5px;
+}
+
+.timeframe-tabs li:hover {
+  color: var(--text-primary);
+}
+
+.timeframe-tabs li.active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Optional: Adds a cool underline to the active tab */
+.timeframe-tabs li.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--text-primary);
+  border-radius: 2px;
+}
+
+/* --- Mode Toggle (Forecast / Air Quality) --- */
+.mode-toggle {
+  display: flex;
+  background-color: var(--card-bg);
+  border-radius: 30px;
+  padding: 5px;
+}
+
+.mode-btn {
+  background: transparent;
+  border: none;
+  border-radius: 25px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mode-btn.active {
+  background-color: var(--accent-blue);
+  color: #121212; /* Dark text on the light blue button */
+}
+
+/* --- Temporary Placeholder Boxes --- */
+.placeholder-box {
+  background-color: var(--card-bg);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  color: var(--text-secondary);
+  border: 1px dashed #555;
+  height: 100%;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Mobile Responsiveness for Main Layout --- */
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr; /* Stacks panels on tablets and phones */
+  }
+  
+  .dashboard-nav {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+}
+
+/* --- Current Weather Card (Hero Card) --- */
+.current-weather-card {
+  background-color: var(--accent-blue); /* The light blue background */
+  color: #121212; /* Dark text for contrast */
+  border-radius: 24px;
+  padding: 25px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.card-header .time {
+  font-weight: 500;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.main-temp-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.huge-temp {
+  font-size: 5rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* --- Weather Details Layout --- */
+.weather-details-grid {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  font-size: 0.85rem;
+  gap: 20px; /* THE FIX: Forces a strict gap between the left and right columns */
+}
+
+.details-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Pushes the Sunrise/Sunset items to the bottom to align with Pressure/Humidity */
+  gap: 10px; /* Adds a bit more vertical breathing room between the lines */
+}
+
+.details-col p {
+  color: #333333; 
+}
+
+.details-col strong {
+  color: #121212;
+  margin-left: 5px;
+}
+
+.align-right {
+  text-align: right;
+  align-items: flex-end;
+  white-space: nowrap; /* THE FIX: Prevents the text from wrapping or squishing when the screen gets smaller */
+}
+
+/* --- Hero Row (Groups Current Weather and Weekly Forecast) --- */
+.hero-row {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+/* --- Weekly Forecast Row --- */
+.weekly-forecast-container {
+  display: flex;
+  gap: 15px;
+  flex: 1; /* Tells it to take up the remaining space next to the hero card */
+  justify-content: space-between;
+}
+
+/* --- UPGRADED WEEKLY FORECAST CARDS --- */
+.forecast-mini-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 12px;
+  border-radius: 15px;
+  
+  /* 1. Depth: Replace the flat color with a subtle premium gradient */
+  background: linear-gradient(145deg, var(--card-bg) 0%, rgba(0,0,0,0.1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05); /* Soft glass edge */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  
+  /* Buttery smooth animation for the hover effect */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+  cursor: pointer;
+  min-width: 70px; /* Keeps them uniformly sized */
+}
+
+/* 2. Visual Pop: Add a shadow specifically to the weather icons */
+.forecast-mini-card img {
+  filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.3));
+  transform: scale(1.15); /* Makes the icons slightly larger and prouder */
+  margin: 8px 0;
+}
+
+/* 3. Micro-interaction: The Hover "Lift" Effect */
+.forecast-mini-card:hover {
+  transform: translateY(-8px); /* Lifts the card up */
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15); /* Deepens the shadow */
+  border-color: rgba(59, 130, 246, 0.3); /* Subtle blue glow on the border */
+}
+
+/* 4. Hierarchy: Make the VERY FIRST card stand out as "Right Now" */
+.weekly-forecast-container .forecast-mini-card:first-child {
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.15) 0%, var(--card-bg) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.forecast-day {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.forecast-icon {
+  margin: 15px 0;
+}
+
+.forecast-temp {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* --- Mobile Responsiveness for Step 4 & 5 --- */
+@media (max-width: 1200px) {
+  .hero-row {
+    flex-direction: column; /* Stack the big card and small cards on smaller screens */
+  }
+  
+  .weekly-forecast-container {
+    overflow-x: auto; /* Allow horizontal scrolling if the screen is too narrow */
+    padding-bottom: 10px; /* Space for scrollbar */
+  }
+  
+  .forecast-mini-card {
+    min-width: 90px; /* Make them a bit wider for touch targets on mobile */
+  }
+}
+
+/* --- Today's Overview Section --- */
+.overview-section {
+  margin-top: 30px;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.overview-grid {
+  display: grid;
+  /* 3 Columns for Desktop */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.overview-card {
+  background-color: var(--card-bg);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 180px;
+}
+
+.card-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.card-value-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 15px;
+}
+
+.card-value-row h4 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.unit {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.time-small {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.card-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  max-width: 120px;
+  text-align: right;
+  line-height: 1.3;
+}
+
+.card-icon-center, .uv-gauge-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  margin: 10px 0;
+}
+
+/* Fake Wind Chart */
+.wind-chart-placeholder {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 60px;
+  margin-top: 10px;
+  padding: 0 10px;
+}
+
+.wind-chart-placeholder .bar {
+  width: 6px;
+  background-color: var(--text-secondary);
+  border-radius: 3px;
+  opacity: 0.5;
+}
+/* =========================================
+   PROMO CARD (Global Map Section)
+   ========================================= */
+.promo-card {
+  position: relative; /* Required for the overlay */
+  overflow: hidden;   /* Keeps the dark gradient from spilling outside the curved corners */
+  background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop') center/cover;
+  border-radius: 20px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  
+  /* Forces it to the 3rd column and spans 2 rows starting from row 1 */
+  grid-column: 3; 
+  grid-row: 1 / span 2; 
+}
+
+/* 1. The Sleek Dark Overlay */
+.promo-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  /* Darker at the top where the text is, fading to lighter at the bottom */
+  background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 100%);
+  z-index: 1;
+}
+
+/* 2. Bring content to the front (above the dark overlay) */
+.promo-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* 3. Polished Typography */
+.promo-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #ffffff; /* Forces text to be pure white in both Light and Dark modes */
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6); /* Soft, natural drop shadow */
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+/* 4. The Blue Call-to-Action Button */
+.promo-btn {
+  background-color: #3b82f6; /* Beautiful bright blue to match your screenshot */
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); /* Adds a subtle blue glow */
+}
+
+.promo-btn:hover {
+  transform: scale(1.05);
+  background-color: #2563eb; /* Slightly darker blue when hovered */
+} 
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 1200px) {
+  .overview-grid {
+    grid-template-columns: repeat(2, 1fr); 
+  }
+  .promo-card {
+    /* Reset on tablets so it drops to the bottom and spans the width */
+    grid-column: 1 / -1; 
+    grid-row: auto; 
+  }
+}
+
+@media (max-width: 768px) {
+  .overview-grid {
+    grid-template-columns: 1fr; 
+  }
+  .promo-card {
+    grid-column: 1 / -1;
+  }
+}
+
+/* --- Sidebar Container --- */
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.section-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.see-all {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.see-all:hover {
+  color: var(--text-primary);
+}
+
+/* --- Chance of Rain Chart --- */
+.rain-chart-container {
+  display: flex;
+  height: 180px;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.chart-y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 25px; /* Aligns with the bars, leaving room for X-axis text */
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.chart-columns {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.chart-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  width: 30px;
+}
+
+.chart-bar-area {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  border-bottom: 1px solid #333;
+}
+
+.chart-line {
+  width: 2px;
+  background-color: var(--accent-blue);
+  border-radius: 2px;
+}
+
+.chart-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--accent-blue);
+  border-radius: 50%;
+  position: absolute;
+  transform: translateY(4px); /* Centers the dot on the line */
+  box-shadow: 0 0 10px var(--accent-blue);
+}
+
+.chart-time {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 10px;
+}
+
+/* --- Other Cities List --- */
+.cities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.city-card {
+  background-color: var(--card-bg);
+  border-radius: 20px;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  cursor: pointer;
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.05)); 
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.city-card:hover {
+  transform: scale(1.02);
+  background-color: var(--hover-bg);
+}
+
+.city-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.country-label, .city-condition {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.city-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* We will add more utility classes here as we build */
+
+/* --- Modal Styles --- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensures it stays on top of everything */
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  width: 90%;
+  max-width: 400px;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.add-city-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.add-city-form input {
+  flex: 1;
+  background-color: var(--bg-color);
+  border: none;
+  padding: 12px 15px;
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.add-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  width: 45px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.2s;
+}
+
+.add-btn:hover { opacity: 0.8; }
+
+.modal-cities-list {
+  max-height: 300px;
+  overflow-y: auto; /* Adds a scrollbar if they save too many cities */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-city-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  background-color: var(--bg-color);
+  border-radius: 10px;
+}
+
+.modal-city-name {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex: 1;
+  font-weight: 500;
+}
+.modal-header .icon-btn, 
+.map-header .icon-btn {
+  background: rgba(255, 255, 255, 0.05) !important; /* Very subtle transparent circle */
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px; /* Matches your card corners */
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modal-header .icon-btn:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  transform: scale(1.1);
+}
+
+
+
+.modal-city-name:hover { color: #3b82f6; }
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #ef4444; /* Red for delete */
+  cursor: pointer;
+  padding: 5px;
+  opacity: 0.6;
+}
+
+.delete-btn:hover { opacity: 1; }
+
+/* --- Settings Modal Styles --- */
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.setting-label {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.toggle-group {
+  display: flex;
+  gap: 5px;
+  background-color: var(--bg-color);
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.toggle-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.toggle-btn.active {
+  background-color: #3b82f6;
+  color: white;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+}
+
+.map-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Darkened to match Favorites Modal */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px); /* Matched blur to Favorites Modal */
+}
+
+.map-modal-content {
+  background-color: var(--card-bg);
+  width: 90vw;
+  height: 85vh; 
+  border-radius: 25px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* NEW: This ensures nothing can ever spill out of the box */
+  overflow: hidden; 
+}
+
+.iframe-container {
+  flex: 1;
+  /* CHANGED: Removed the huge min-height. 'flex: 1' will naturally make it take up exactly the right amount of space without pushing the footer out! */
+  margin: 15px 0;
+  background: #000;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.map-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  border-radius: 10px;
+  /* Use your app's secondary text color for a smart, adaptive border */
+  border: 1px solid var(--text-secondary); 
+  background: transparent;
+  /* Text automatically switches between black/white based on theme */
+  color: var(--text-primary); 
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* Add a subtle hover effect so they feel clickable */
+.control-btn:hover {
+  border-color: var(--text-primary);
+}
+
+.control-btn.active {
+  /* Use a deeper, high-contrast blue (#2563eb) instead of the light blue */
+  background: #2563eb; 
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); /* Adds a subtle blue glow */
+}
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.map-title-group h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+.map-title-group p {
+  margin: 5px 0 0 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* --- UI POLISH: Sleek Close Button --- */
+.map-header .icon-btn {
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  cursor: pointer;
+  border-radius: 50%; /* Makes the hover effect a perfect circle */
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.map-header .icon-btn:hover {
+  background-color: rgba(150, 150, 150, 0.2); /* Subtle gray highlight on hover */
+}
+
+/* --- UI POLISH: Premium Pro-Tip Callout Box --- */
+.map-footer {
+  margin-top: 15px;
+}
+
+.pro-tip-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(59, 130, 246, 0.1); /* Very subtle blue tint */
+  border-left: 4px solid #3b82f6; /* Bold blue accent line on the left */
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.pro-tip-box p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.tip-icon {
+  color: #3b82f6; /* Matches the blue accent */
+  flex-shrink: 0; /* Prevents the icon from squishing on small screens */
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS (MEDIA QUERIES)
+   ========================================= */
+
+/* Tablets & Smaller Laptops (under 1024px) */
+@media (max-width: 1024px) {
+  .main-layout {
+    flex-direction: column; /* Stacks the main dashboard and the sidebar */
+  }
+
+  .right-panel {
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .sidebar-container {
+    width: 100%;
+  }
+}
+
+/* Mobile Phones (under 768px) */
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch; /* Fix: Forces the search bar to fill the space */
+  }
+
+  .search-container {
+    width: 100%; 
+  }
+
+  .header-controls {
+    width: 100%;
+    justify-content: center; /* Fix: Centers the Theme/Bookmark/Settings icons */
+    gap: 25px; /* Spaces the icons out so they are easy to tap */
+  }
+
+  /* 2. Stack the Top Section */
+  .hero-row {
+    flex-direction: column;
+  }
+
+  .current-weather-card {
+    width: 100%;
+  }
+
+  /* 3. NATIVE APP FEEL: Horizontal Swipe for Forecast Cards */
+  .weekly-forecast-container {
+    display: flex;
+    overflow-x: auto; /* Allows horizontal scrolling */
+    padding-bottom: 10px; 
+    gap: 15px;
+    scroll-snap-type: x mandatory; /* Makes the cards "snap" into place when swiping */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iPhones */
+  }
+
+  .weekly-forecast-container::-webkit-scrollbar {
+    display: none; /* Hides the ugly scrollbar for a clean look */
+  }
+
+  .forecast-mini-card {
+    min-width: 85px; /* Prevents them from shrinking */
+    scroll-snap-align: start; /* Alignment for the snap effect */
+  }
+
+  /* 4. FIX: Overview Cards Mobile Polish */
+  .overview-grid {
+    grid-template-columns: 1fr; 
+    gap: 15px;
+  }
+
+  .overview-card {
+    min-height: 150px; /* Forces the cards to be tall enough to read */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers everything horizontally */
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .card-value-row {
+    justify-content: center; /* Stops text from flying to the far right edge */
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .card-icon-center svg {
+    transform: scale(1.5); /* Bumps up the size of the UV/Water/Eye icons */
+    margin: 10px 0;
+  }
+
+  .wind-chart-placeholder {
+    justify-content: center; /* Centers the wind bars */
+    width: 100%;
+    margin: 15px 0;
+  }
+  /* 5. Map Modal Mobile Fixes */
+  .map-modal-content {
+    width: 95vw;
+    height: 90vh; 
+    padding: 15px;
+  }
+
+  .map-controls {
+    flex-wrap: wrap; /* Allows the Wind/Wave buttons to stack on small screens */
+  }
+
+  .control-btn {
+    flex: 1 1 auto; /* Makes the buttons stretch to fill the row evenly */
+    justify-content: center;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  
+  .pro-tip-box {
+    align-items: flex-start; /* Keeps the lightbulb at the top if text wraps */
+  }
+} 
+
+
+
