@@ -1,58 +1,98 @@
-import { useState } from 'react'; 
-import { MapPin, Search, Moon, Sun, Bookmark, Settings, LocateFixed } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useDebounce } from '../hooks/useDebounce';
+import { fetchCitySuggestions } from '../api';
+// Assuming you use lucide-react for icons. Adjust if you use something else!
+import { Search, MapPin, Bookmark, Settings, Sun, Moon, Crosshair } from 'lucide-react';
 
-// 1. Added 'onOpenModal' to the props we accept
 const Header = ({ isDarkMode, toggleTheme, city, onSearch, onOpenModal, onOpenSettings, onLocate }) => {
-  const [searchInput, setSearchInput] = useState('');
+  // --- NEW STATE FOR AUTOCOMPLETE ---
+  const [searchTerm, setSearchTerm] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  
+  // 1. The Debounce Hook: Waits 300ms after the user stops typing
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  const handleSubmit = (e) => {
-    e.preventDefault(); 
-    if (searchInput.trim() !== '') {
-      onSearch(searchInput); 
-      setSearchInput(''); 
+  // 2. The API Effect: Runs ONLY when the debounced word changes
+  useEffect(() => {
+    // Only search if they typed at least 3 letters
+    if (debouncedSearchTerm.length >= 3) {
+      const getSuggestions = async () => {
+        const results = await fetchCitySuggestions(debouncedSearchTerm);
+        setSuggestions(results);
+        setIsDropdownOpen(true);
+      };
+      getSuggestions();
+    } else {
+      setSuggestions([]);
+      setIsDropdownOpen(false);
     }
+  }, [debouncedSearchTerm]);
+
+  // 3. Handle City Selection
+  const handleSelectCity = (selectedCityObj) => {
+    // Format the query for the main WeatherAPI call (e.g., "London, United Kingdom")
+    const searchQuery = `${selectedCityObj.name}, ${selectedCityObj.country}`;
+    
+    onSearch(searchQuery); // Tell App.jsx to fetch the weather
+    setSearchTerm('');     // Clear the input box
+    setIsDropdownOpen(false); // Close the menu
   };
 
   return (
     <header className="header-container">
-      
+      {/* Left Side: Current Location Display */}
       <div className="location-display">
-        <MapPin size={20} className="icon-secondary" />
+        <MapPin className="icon-secondary" size={24} />
         <span className="location-text">{city}</span>
       </div>
 
-      <form className="search-container" onSubmit={handleSubmit}>
-        <Search size={20} className="icon-secondary" />
+      {/* Middle: The Search Bar & Dropdown Menu */}
+      {/* We add position: 'relative' here so the dropdown floats perfectly below it */}
+      <div className="search-container" style={{ position: 'relative' }}>
+        <Search className="icon-secondary" size={20} />
         <input 
           type="text" 
-          placeholder="Search City..." 
-          className="search-input"
-          value={searchInput} 
-          onChange={(e) => setSearchInput(e.target.value)} 
+          className="search-input" 
+          placeholder="Search for cities..." 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
-      </form>
 
+        {/* --- THE AUTOCOMPLETE DROPDOWN UI --- */}
+        {isDropdownOpen && suggestions.length > 0 && (
+          <ul className="suggestions-dropdown">
+            {suggestions.map((item) => (
+              <li 
+                key={item.id} 
+                className="suggestion-item"
+                onClick={() => handleSelectCity(item)}
+              >
+                <span className="sugg-name">{item.name}</span>
+                <span className="sugg-region">
+                  {item.region ? `${item.region}, ` : ''}{item.country}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Right Side: Controls */}
       <div className="header-controls">
-        
-        {/* NEW BUTTON: The GPS Target Icon */}
-        <button className="icon-btn" aria-label="Use Current Location" onClick={onLocate} title="Locate Me">
-          <LocateFixed size={20} />
+        <button onClick={onLocate} title="Current Location">
+          <Crosshair size={20} />
         </button>
-
-        <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle Theme">
-          {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
+        <button onClick={toggleTheme} className="theme-toggle">
+          {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
         </button>
-        
-        {/* 2. Added onClick={onOpenModal} right here! */}
-        <button className="icon-btn" aria-label="Saved Locations" onClick={onOpenModal}>
+        <button onClick={onOpenModal} title="Saved Locations">
           <Bookmark size={20} />
         </button>
-        
-        <button className="icon-btn" aria-label="Settings" onClick={onOpenSettings}>
+        <button onClick={onOpenSettings} title="Settings">
           <Settings size={20} />
         </button>
       </div>
-
     </header>
   );
 };

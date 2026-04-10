@@ -14,6 +14,32 @@
   --accent-blue: #bbd8ec;
 }
 /* =========================================
+   🚨 HORIZONTAL OVERFLOW FIX (Mobile Saver)
+   ========================================= */
+html, body, #root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden; /* Kills the page-sliding bug immediately */
+  margin: 0;
+}
+
+/* CRITICAL: This prevents flexbox children (like your swipeable forecast) 
+   from stretching the screen wider than your phone */
+.dashboard-container, 
+.main-layout, 
+.left-panel, 
+.right-panel, 
+.hero-row {
+  min-width: 0; 
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.weekly-forecast-container {
+  width: 100%;
+  max-width: 100%;
+}
+/* =========================================
    GLOBAL SLEEK SCROLLBARS 
    ========================================= */
 
@@ -216,18 +242,6 @@ body {
   padding: 10px 20px !important;
 }
 
-/* --- Mobile Responsiveness for Header --- */
-@media (max-width: 768px) {
-  .header-container {
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-  .search-container {
-    order: 3;
-    width: 100%;
-    max-width: 100%;
-  }
-}
 
 /* --- Main Layout Grid --- */
 .main-layout {
@@ -328,17 +342,6 @@ body {
   justify-content: center;
 }
 
-/* --- Mobile Responsiveness for Main Layout --- */
-@media (max-width: 1024px) {
-  .main-layout {
-    grid-template-columns: 1fr; /* Stacks panels on tablets and phones */
-  }
-  
-  .dashboard-nav {
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-}
 
 /* --- Current Weather Card (Hero Card) --- */
 .current-weather-card {
@@ -482,22 +485,6 @@ body {
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--text-primary);
-}
-
-/* --- Mobile Responsiveness for Step 4 & 5 --- */
-@media (max-width: 1200px) {
-  .hero-row {
-    flex-direction: column; /* Stack the big card and small cards on smaller screens */
-  }
-  
-  .weekly-forecast-container {
-    overflow-x: auto; /* Allow horizontal scrolling if the screen is too narrow */
-    padding-bottom: 10px; /* Space for scrollbar */
-  }
-  
-  .forecast-mini-card {
-    min-width: 90px; /* Make them a bit wider for touch targets on mobile */
-  }
 }
 
 /* --- Today's Overview Section --- */
@@ -655,27 +642,6 @@ body {
   transform: scale(1.05);
   background-color: #2563eb; /* Slightly darker blue when hovered */
 } 
-
-/* --- Mobile Responsiveness --- */
-@media (max-width: 1200px) {
-  .overview-grid {
-    grid-template-columns: repeat(2, 1fr); 
-  }
-  .promo-card {
-    /* Reset on tablets so it drops to the bottom and spans the width */
-    grid-column: 1 / -1; 
-    grid-row: auto; 
-  }
-}
-
-@media (max-width: 768px) {
-  .overview-grid {
-    grid-template-columns: 1fr; 
-  }
-  .promo-card {
-    grid-column: 1 / -1;
-  }
-}
 
 /* --- Sidebar Container --- */
 .sidebar-container {
@@ -1107,125 +1073,235 @@ body {
 }
 
 /* =========================================
-   MOBILE RESPONSIVENESS (MEDIA QUERIES)
+   📱 MASTER RESPONSIVE DESIGN
    ========================================= */
 
-/* Tablets & Smaller Laptops (under 1024px) */
+/* --- TABLETS & SMALL LAPTOPS (max-width: 1024px) --- */
 @media (max-width: 1024px) {
+  /* 1. Stack the Main Dashboard and Sidebar */
   .main-layout {
-    flex-direction: column; /* Stacks the main dashboard and the sidebar */
-  }
-
-  .right-panel {
-    width: 100%;
-    margin-top: 20px;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 30px;
   }
   
-  .sidebar-container {
-    width: 100%;
-  }
-}
-
-/* Mobile Phones (under 768px) */
-@media (max-width: 768px) {
-  .header-container {
-    flex-direction: column;
-    gap: 15px;
-    align-items: stretch; /* Fix: Forces the search bar to fill the space */
-  }
-
-  .search-container {
-    width: 100%; 
-  }
-
-  .header-controls {
-    width: 100%;
-    justify-content: center; /* Fix: Centers the Theme/Bookmark/Settings icons */
-    gap: 25px; /* Spaces the icons out so they are easy to tap */
-  }
-
-  /* 2. Stack the Top Section */
-  .hero-row {
-    flex-direction: column;
-  }
-
-  .current-weather-card {
-    width: 100%;
-  }
-
-  /* 3. NATIVE APP FEEL: Horizontal Swipe for Forecast Cards */
-  .weekly-forecast-container {
-    display: flex;
-    overflow-x: auto; /* Allows horizontal scrolling */
-    padding-bottom: 10px; 
-    gap: 15px;
-    scroll-snap-type: x mandatory; /* Makes the cards "snap" into place when swiping */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iPhones */
-  }
-
-  .weekly-forecast-container::-webkit-scrollbar {
-    display: none; /* Hides the ugly scrollbar for a clean look */
-  }
-
-  .forecast-mini-card {
-    min-width: 85px; /* Prevents them from shrinking */
-    scroll-snap-align: start; /* Alignment for the snap effect */
-  }
-
-  /* 4. FIX: Overview Cards Mobile Polish */
-  .overview-grid {
-    grid-template-columns: 1fr; 
-    gap: 15px;
-  }
-
-  .overview-card {
-    min-height: 150px; /* Forces the cards to be tall enough to read */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centers everything horizontally */
-    justify-content: center;
-    text-align: center;
-    padding: 20px;
-  }
-
-  .card-value-row {
-    justify-content: center; /* Stops text from flying to the far right edge */
-    width: 100%;
+  /* 2. Expand Sidebar to sit at the bottom */
+  .right-panel, .sidebar-container {
+    width: 100% !important;
+    max-width: 100% !important;
     margin-top: 10px;
   }
 
-  .card-icon-center svg {
-    transform: scale(1.5); /* Bumps up the size of the UV/Water/Eye icons */
-    margin: 10px 0;
+  /* 3. Overview Grid -> 2 Columns */
+  .overview-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 
-  .wind-chart-placeholder {
-    justify-content: center; /* Centers the wind bars */
-    width: 100%;
-    margin: 15px 0;
+  /* 4. Promo Card drops below the overview cards */
+  .promo-card {
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
   }
+}
+/* =========================================
+   🔍 AUTOCOMPLETE DROPDOWN STYLES
+   ========================================= */
+
+/* The floating glass panel */
+.suggestions-dropdown {
+  position: absolute;
+  top: 110%; /* Pushes it just slightly below the search bar */
+  left: 0;
+  width: 100%; /* Perfectly matches the width of the search bar */
+  background-color: var(--card-bg);
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05); /* Soft glass edge */
+  z-index: 1000; /* Forces it to float ABOVE everything else on the dashboard */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow: hidden; /* Keeps the rounded corners intact when hovering */
+  
+  /* Adds a smooth slide-down animation */
+  animation: slideDown 0.2s ease-out forwards;
+}
+
+/* Individual city rows */
+.suggestion-item {
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.2s ease;
+}
+
+/* Removes the border from the very last item so it looks clean */
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background-color: var(--hover-bg);
+}
+
+/* Typography for the dropdown */
+.sugg-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.sugg-region {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* --- LIGHT MODE ADAPTATIONS --- */
+body.light-mode .suggestions-dropdown {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); /* Softer shadow for light mode */
+  border: 1px solid #e5e7eb;
+}
+
+body.light-mode .suggestion-item {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* Smooth entry animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- MOBILE PHONES (max-width: 768px) --- */
+@media (max-width: 768px) {
+  body {
+    padding: 12px !important; /* Tighter padding for small screens */
+  }
+
+  /* 1. Header Layout */
+  .header-container {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+  .search-container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .header-controls {
+    width: 100%;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  /* 2. Top Weather Section */
+  .hero-row {
+    flex-direction: column;
+  }
+  .current-weather-card {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .weather-details-grid {
+    flex-direction: column; /* Stacks Sunrise/Sunset below Humidity */
+    gap: 15px;
+  }
+  .align-right {
+    text-align: left !important;
+    align-items: flex-start !important;
+  }
+
+  /* 3. NATIVE APP FEEL: Weekly Forecast Horizontal Swipe */
+  .weekly-forecast-container {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    gap: 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+  .weekly-forecast-container::-webkit-scrollbar {
+    display: none; /* Hides scrollbar on mobile */
+  }
+  .forecast-mini-card {
+    min-width: 90px;
+    scroll-snap-align: start;
+    flex-shrink: 0; /* Prevents cards from squishing together */
+  }
+
+  /* 4. Overview Grid -> 1 Column */
+  .overview-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .overview-card {
+    align-items: center;
+    text-align: center;
+    min-height: 150px;
+  }
+  .card-value-row {
+    justify-content: center;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .card-desc {
+    text-align: center;
+  }
+  .wind-chart-placeholder {
+    justify-content: center;
+  }
+
   /* 5. Map Modal Mobile Fixes */
   .map-modal-content {
     width: 95vw;
-    height: 90vh; 
+    height: 90vh;
     padding: 15px;
   }
-
   .map-controls {
-    flex-wrap: wrap; /* Allows the Wind/Wave buttons to stack on small screens */
+    flex-wrap: wrap;
   }
-
   .control-btn {
-    flex: 1 1 auto; /* Makes the buttons stretch to fill the row evenly */
+    flex: 1 1 auto;
     justify-content: center;
     padding: 8px 10px;
     font-size: 0.9rem;
   }
-  
-  .pro-tip-box {
-    align-items: flex-start; /* Keeps the lightbulb at the top if text wraps */
+}
+
+/* =========================================
+   🔧 NAVIGATION SQUISH FIX
+   ========================================= */
+
+/* 1. Stop the text from breaking into multiple lines globally */
+.timeframe-tabs li {
+  white-space: nowrap; 
+}
+
+/* 2. Fix the layout for mobile phones */
+@media (max-width: 768px) {
+  .dashboard-nav {
+    flex-direction: column; /* Stacks the tabs on top of the toggle */
+    align-items: flex-start; /* Aligns them nicely to the left */
+    gap: 15px;
+    margin-bottom: 20px;
   }
-} 
-
-
-
+  
+  .timeframe-tabs {
+    width: 100%;
+    gap: 20px;
+    font-size: 1rem; /* Slightly smaller text for mobile */
+  }
+}
